@@ -1,0 +1,13 @@
+{
+  "name": "realtime",
+  "homepage": "https://github.com/janpapenbrock/realtime",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/janpapenbrock/realtime.git"
+  },
+  "dependencies": {
+    "mime": "^1.2.11",
+    "socket.io": "^1.2.1"
+  }
+}

@@ -4,7 +4,7 @@ function start(io) {
 
     function getViewCounter (host, callback) {
         var data = host;
-        // do sth
+        // todo: do something here
         callback(data);
     }
  
@@ -14,7 +14,7 @@ function start(io) {
      
         console.log("updateData: " + view);
      
-        setTimeout (updateData, 1000) //queue for next ping in the next predefined interval
+        setTimeout (updateData, 1000);
      
         getViewCounter(view, function (status) {
             io.emit('data-update', { content: status });

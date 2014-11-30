@@ -7,6 +7,7 @@
     "url": "http://github.com/janpapenbrock/realtime.git"
   },
   "dependencies": {
+    "googleapis": "^1.0.21",
     "mime": "^1.2.11",
     "socket.io": "^1.2.1"
   }

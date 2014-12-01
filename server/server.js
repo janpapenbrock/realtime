@@ -1,7 +1,7 @@
 var http = require('http');
 var url = require("url");
 
-function start(route, socket) {
+function start(route) {
 
     var server = http.createServer(function(request, response) {
         var pathname = url.parse(request.url, true).pathname;
@@ -10,13 +10,11 @@ function start(route, socket) {
         route(pathname, response);
     });
 
-    console.log(socket);
-
-    socket(server);
-
     server.listen(8888);
 
     console.log("Server started and waiting for connections.");
+
+    return server;
 }
 
 exports.start = start;

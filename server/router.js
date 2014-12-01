@@ -9,7 +9,7 @@ function route(pathname, response) {
         pathname = "/index.html"
     }
 
-    filename = __dirname + '/client' + pathname;
+    filename = __dirname + '/../client' + pathname;
 
     fs.exists(filename, function(exists) {
         if (exists) {

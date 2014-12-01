@@ -3,6 +3,8 @@ var google = require('googleapis');
 
 var googleConfig = require('../config/google.json');
 
+var isAuthorized = false;
+
 function analytics() {
     var analytics = google.analytics({
         version: 'v3',
@@ -26,6 +28,8 @@ function authClient() {
 
     authClient.authorize(function(err, tokens) {
         if (err) throw err;
+
+        isAuthorized = true;
     });
 
     return authClient;
@@ -41,6 +45,10 @@ function start() {
     var al = analytics();
 
     setTimeout (function() {
+
+        if (!isAuthorized) {
+            return;
+        }
 
         al.data.realtime.get(params, function(err, data) {
             console.log(err);

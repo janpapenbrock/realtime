@@ -1,5 +1,4 @@
 var io = require('socket.io');
-var emitter = require("./emitter.js");
 
 function start(server) {
     io = io(server);
@@ -12,7 +11,7 @@ function start(server) {
         });
     });
 
-    emitter.start(io);
+    return io;
 };
 
 exports.start = start;

@@ -9,5 +9,7 @@ var io = socket.start(httpServer);
 
 emitter.start(io);
 
+var realtime = require('./server/realtime.js');
+realtime.start();
 
 

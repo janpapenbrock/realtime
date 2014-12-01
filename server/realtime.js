@@ -1,25 +1,35 @@
+var events = require('events');
+var eventEmitter = new events.EventEmitter();
+
 var fs = require('fs');
 var google = require('googleapis');
 
-var googleConfig = require('../config/google.json');
+var googleConfig = require(__dirname + '/../config/google.json');
 
-var isAuthorized = false;
+var analytics;
+var authClient;
 
-function analytics() {
-    var analytics = google.analytics({
+var start = function() {
+    eventEmitter.on("authorized", initializeAnalytics);
+    eventEmitter.on("analyticsInitialized", requestRealTimeData);
+    authorize();
+};
+
+var initializeAnalytics = function() {
+    analytics = google.analytics({
         version: 'v3',
-        auth: authClient()
+        auth: authClient
     });
 
-    return analytics;
-}
+    eventEmitter.emit('analyticsInitialized');
+};
 
-function authClient() {
+var authorize = function() {
     var keypath = __dirname + '/../config/' + googleConfig.keypath;
     var key = fs.readFileSync(keypath).toString();
     var scopes = ['https://www.googleapis.com/auth/analytics.readonly'];
 
-    var authClient = new google.auth.JWT(
+    authClient = new google.auth.JWT(
         googleConfig.email, 
         keypath, 
         key,
@@ -27,36 +37,28 @@ function authClient() {
     );
 
     authClient.authorize(function(err, tokens) {
-        if (err) throw err;
+        if (err) {
+            console.log(err);
+            throw err;
+        }
 
-        isAuthorized = true;
+        eventEmitter.emit('authorized');
     });
+};
 
-    return authClient;
-}
-
-function start() {
-
+var requestRealTimeData = function() {
     var params = {
         ids:     googleConfig.tableId,
         metrics: 'rt:activeUsers',
     };
 
-    var al = analytics();
-
     setTimeout (function() {
-
-        if (!isAuthorized) {
-            return;
-        }
-
-        al.data.realtime.get(params, function(err, data) {
+        analytics.data.realtime.get(params, function(err, data) {
             console.log(err);
             console.log(data);
         });
 
     }, 2000);
+};
 
-}
-
-start()
+exports.start = start;

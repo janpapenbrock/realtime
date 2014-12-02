@@ -5,14 +5,14 @@ function start(route) {
 
     var server = http.createServer(function(request, response) {
         var pathname = url.parse(request.url, true).pathname;
-        console.log("Request received: "+pathname);
+        console.log("HTTP: Request received: "+pathname);
 
         route(pathname, response);
     });
 
     server.listen(8888);
 
-    console.log("Server started and waiting for connections.");
+    console.log("HTTP: Server started and waiting for connections.");
 
     return server;
 }

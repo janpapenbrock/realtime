@@ -3,7 +3,7 @@ var mime = require('mime');
 
 function route(pathname, response) {
     var filename;
-    console.log("About to route a request for " + pathname);
+    console.log("Router: About to route a request for " + pathname);
 
     if (pathname === "/") {
         pathname = "/index.html"

@@ -34,11 +34,15 @@ var authorize = function(next) {
         scopes
     );
 
+    console.log("Analytics: Authorization started.");
+
     authClient.authorize(function (err, tokens) {
         if (err) {
             console.log(err);
             throw err;
         }
+
+        console.log("Analytics: Authorized.");
 
         next(null, authClient);
     });

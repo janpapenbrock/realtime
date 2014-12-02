@@ -58,6 +58,11 @@ var requestRealTimeDataForProfile = function(analytics, profile) {
     };
 
     analytics.data.realtime.get(params, function(err, data) {
+        if (err) {
+            console.log(err);
+            return;
+        }
+
         if (data.totalsForAllResults) {
             profile.activeUsers = data.totalsForAllResults['rt:activeUsers'];
             console.log(profile.name);

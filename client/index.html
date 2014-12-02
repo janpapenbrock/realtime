@@ -2,32 +2,62 @@
 <head>
     <title>Hello World</title>
     <script src="/socket.io/socket.io.js"></script>
+
     <script src="/jquery-2.1.1.min.js"></script>
+    <script src="/underscore-1.7.0.min.js"></script>
+    <script src="/backbone-1.1.2.min.js"></script>
+
+    <script type="text/template" id="counter-row-template">
+        <span class="counter"><%= activeUsers %></span>
+        <img src="http://www.google.com/s2/favicons?domain=<%= domain %>" class="favicon" />
+        <span class="name"><%= name %></span>
+    </script>
+
+    <script>
+        var Profile = Backbone.Model.extend({
+            initialize: function()
+            {
+                this.set("domain", this.get("websiteUrl").split("//")[1]);
+            }
+        });
+
+        var CounterRow = Backbone.View.extend({
+
+            tagName: "li",
+
+            className: "counter-row",
+
+            initialize: function() {
+                this.listenTo(this.model, "change", this.render);
+                this.render();
+            },
+
+            render: function() {
+                var templateHtml = jQuery("#counter-row-template").html();
+                var attributes = this.model.attributes;
+                var template = _.template(templateHtml);
+                this.$el.html(template(attributes));
+                return this;
+            }
+        });
+    </script>
+
     <script>
       var socket = io();
       socket.on('data-update', function(data) {
           console.log(data);
 
-          var profile = data.profile;
+          var profile = new Profile(data.profile);
 
-          var rowId = "row" + profile.id;
+          var view = new CounterRow({
+              model: profile,
+              id: "counter-row-" + profile.id
+          });
 
-          var $element = jQuery("#" + rowId);
-          console.log($element.length);
-          if ($element.length < 1) {
-              var domain = profile.websiteUrl.split("//")[1];
-              var favicon = "http://www.google.com/s2/favicons?domain=" + domain;
-
-              var $favicon = jQuery('<img>').attr('src', favicon).attr('height', 24).attr('width', 24);
-
-              $element = jQuery('<li>').html(profile.name + ": <span class=\"counter\" />").prepend($favicon);
-              $element.attr('id', rowId);
-              jQuery('#counters').prepend($element);
-          }
-
-          $element.find('.counter').html(profile.activeUsers);
+          jQuery('#counters').prepend(view.$el);
       });
     </script>
+
 </head>
 <body>
     <blockquote>Hello World</blockquote>

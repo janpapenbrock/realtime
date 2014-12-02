@@ -2,14 +2,37 @@
 <head>
     <title>Hello World</title>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/jquery-2.1.1.min.js"></script>
     <script>
       var socket = io();
-      socket.on('data-update', function(data){
+      socket.on('data-update', function(data) {
           console.log(data);
+
+          var profile = data.profile;
+
+          var rowId = "row" + profile.id;
+
+          var $element = jQuery("#" + rowId);
+          console.log($element.length);
+          if ($element.length < 1) {
+              var domain = profile.websiteUrl.split("//")[1];
+              var favicon = "http://www.google.com/s2/favicons?domain=" + domain;
+
+              var $favicon = jQuery('<img>').attr('src', favicon).attr('height', 24).attr('width', 24);
+
+              $element = jQuery('<li>').html(profile.name + ": <span class=\"counter\" />").prepend($favicon);
+              $element.attr('id', rowId);
+              jQuery('#counters').prepend($element);
+          }
+
+          $element.find('.counter').html(profile.activeUsers);
       });
     </script>
 </head>
 <body>
     <blockquote>Hello World</blockquote>
+    <ul id="counters">
+
+    </ul>
 </body>
 </html>

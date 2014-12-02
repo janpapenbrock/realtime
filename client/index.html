@@ -21,6 +21,10 @@
             }
         });
 
+        var ProfileCollection = Backbone.Collection.extend({
+            model: Profile
+        });
+
         var CounterRow = Backbone.View.extend({
 
             tagName: "li",
@@ -44,17 +48,24 @@
 
     <script>
       var socket = io();
-      socket.on('data-update', function(data) {
-          console.log(data);
 
-          var profile = new Profile(data.profile);
-
+      var profiles = new ProfileCollection();
+      profiles.on("add", function(profile) {
           var view = new CounterRow({
               model: profile,
               id: "counter-row-" + profile.id
           });
 
           jQuery('#counters').prepend(view.$el);
+      });
+
+      socket.on('data-update', function(data) {
+          console.log(data);
+
+          var profile = new Profile(data.profile);
+
+          profiles.add(profile, { merge: true });
+
       });
     </script>
 

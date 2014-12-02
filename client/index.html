@@ -14,6 +14,10 @@
         <span class="name"><%= name %></span>
     </script>
 
+    <script type="text/template" id="totals-counter-template">
+        <span class="counter"><%= activeUsers %></span>
+    </script>
+
     <script>
         var Profile = Backbone.Model.extend({
             initialize: function() {
@@ -34,7 +38,6 @@
         });
 
         var CounterView = Backbone.View.extend({
-
             tagName: "li",
 
             className: "counter-row",
@@ -79,34 +82,57 @@
                 return this;
             }
         });
+
+        var TotalsView = Backbone.View.extend({
+            tagName: "div",
+
+            className: "totals",
+
+            initialize: function() {
+                this.listenTo(this.collection, "change", this.render);
+                this.render();
+            },
+
+            render: function() {
+                var templateHtml = jQuery("#totals-counter-template").html();
+                var attributes = {
+                    activeUsers: this.collection.reduce(function(memo, profile) {
+                        return memo + profile.activeUsers();
+                    }, 0)
+                };
+                var template = _.template(templateHtml);
+                this.$el.html(template(attributes));
+
+                return this;
+            }
+        });
+
     </script>
 
     <script>
       var socket = io();
 
+      var profiles = new ProfileCollection();
+
       var counterCollectionView = new CounterCollectionView({
-          collection: new ProfileCollection(),
+          collection: profiles,
           id: 'counters'
       });
 
-      var profiles = counterCollectionView.collection;
-
-      profiles.on("add", function(profile) {
+      var totalsView = new TotalsView({
+          collection: profiles,
+          id: 'totals'
       });
 
-      profiles.on("change", function(profile) {
+      profiles.on("add change", function(profile) {
           counterCollectionView.render();
+          totalsView.render();
       });
 
       socket.on('data-update', function(data) {
-          console.log(data);
-
           var profile = new Profile(data.profile);
-
+          console.log(profile.get("name") + ": " + profile.get("activeUsers"));
           profiles.add(profile, { merge: true });
-
-          counterCollectionView.render();
-
       });
     </script>
 
@@ -117,6 +143,7 @@
     </div>
 
     <script>
+        jQuery("#container").append(totalsView.render().el);
         jQuery("#container").append(counterCollectionView.render().el);
     </script>
 </body>

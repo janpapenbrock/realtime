@@ -1,35 +1,33 @@
-var events = require('events');
-var eventEmitter = new events.EventEmitter();
-
 var fs = require('fs');
 var google = require('googleapis');
 
 var googleConfig = require(__dirname + '/../config/google.json');
 
-var analytics;
-var authClient;
-
 var start = function() {
-    eventEmitter.on("authorized", initializeAnalytics);
-    eventEmitter.on("analyticsInitialized", requestRealTimeData);
-    authorize();
+    authorize(forward(initializeAnalytics, requestRealTimeData));
 };
 
-var initializeAnalytics = function() {
-    analytics = google.analytics({
+function forward(first, next) {
+    return function(err, result) {
+        first(err, result, next)
+    }
+}
+
+var initializeAnalytics = function(err, authClient, next) {
+    var analytics = google.analytics({
         version: 'v3',
         auth: authClient
     });
 
-    eventEmitter.emit('analyticsInitialized');
+    next(null, analytics);
 };
 
-var authorize = function() {
+var authorize = function(next) {
     var keypath = __dirname + '/../config/' + googleConfig.keypath;
     var key = fs.readFileSync(keypath).toString();
     var scopes = ['https://www.googleapis.com/auth/analytics.readonly'];
 
-    authClient = new google.auth.JWT(
+    var authClient = new google.auth.JWT(
         googleConfig.email, 
         keypath, 
         key,
@@ -42,11 +40,11 @@ var authorize = function() {
             throw err;
         }
 
-        eventEmitter.emit('authorized');
+        next(null, authClient);
     });
 };
 
-var requestRealTimeData = function() {
+var requestRealTimeData = function(err, analytics) {
     var params = {
         ids:     googleConfig.tableId,
         metrics: 'rt:activeUsers',

@@ -1,6 +1,7 @@
 <html>
 <head>
-    <title>Hello World</title>
+    <title>Realtime</title>
+
     <script src="/socket.io/socket.io.js"></script>
 
     <script src="/jquery-2.1.1.min.js"></script>
@@ -15,17 +16,24 @@
 
     <script>
         var Profile = Backbone.Model.extend({
-            initialize: function()
-            {
+            initialize: function() {
                 this.set("domain", this.get("websiteUrl").split("//")[1]);
+            },
+
+            activeUsers: function() {
+                return parseInt(this.get("activeUsers"))
             }
         });
 
         var ProfileCollection = Backbone.Collection.extend({
-            model: Profile
+            model: Profile,
+
+            comparator: function(profile){
+                return 0 - profile.activeUsers();
+            }
         });
 
-        var CounterRow = Backbone.View.extend({
+        var CounterView = Backbone.View.extend({
 
             tagName: "li",
 
@@ -41,6 +49,33 @@
                 var attributes = this.model.attributes;
                 var template = _.template(templateHtml);
                 this.$el.html(template(attributes));
+
+                return this;
+            }
+        });
+
+        var CounterCollectionView = Backbone.View.extend({
+            tagName: 'ul',
+
+            initialize: function(){
+                this.render();
+            },
+
+            render: function(){
+                var $this = this;
+
+                this.$el.html("");
+
+                this.collection.each(function(profile) {
+
+                    if (profile.activeUsers() < 1) {
+                        return;
+                    }
+
+                    var counterView = new CounterView({ model: profile });
+                    $this.$el.append(counterView.el);
+                });
+
                 return this;
             }
         });
@@ -49,14 +84,18 @@
     <script>
       var socket = io();
 
-      var profiles = new ProfileCollection();
-      profiles.on("add", function(profile) {
-          var view = new CounterRow({
-              model: profile,
-              id: "counter-row-" + profile.id
-          });
+      var counterCollectionView = new CounterCollectionView({
+          collection: new ProfileCollection(),
+          id: 'counters'
+      });
 
-          jQuery('#counters').prepend(view.$el);
+      var profiles = counterCollectionView.collection;
+
+      profiles.on("add", function(profile) {
+      });
+
+      profiles.on("change", function(profile) {
+          counterCollectionView.render();
       });
 
       socket.on('data-update', function(data) {
@@ -66,14 +105,19 @@
 
           profiles.add(profile, { merge: true });
 
+          counterCollectionView.render();
+
       });
     </script>
 
 </head>
 <body>
-    <blockquote>Hello World</blockquote>
-    <ul id="counters">
+    <div id="container">
 
-    </ul>
+    </div>
+
+    <script>
+        jQuery("#container").append(counterCollectionView.render().el);
+    </script>
 </body>
 </html>

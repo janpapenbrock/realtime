@@ -1,4 +1,5 @@
 {
-    "email": "somenumber@developer.gserviceaccount.com",
-    "keypath": "key.pem"
+    "email": "1234567890@developer.gserviceaccount.com",
+    "keyPath": "key.pem",
+    "accountIds": [ "1234567890" ]
 }

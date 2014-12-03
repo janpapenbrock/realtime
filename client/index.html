@@ -12,11 +12,13 @@
     <script src="/assets/js/lib/backbone-1.1.2.min.js"></script>
 
     <script src="/assets/js/lib/chartist.js"></script>
+    <script src="/assets/js/lib/colibri.min.js"></script>
 
     <script type="text/template" id="counter-row-template">
         <span class="counter"><%= activeUsers %></span>
-        <img src="http://www.google.com/s2/favicons?domain=<%= domain %>" class="favicon" />
+        <img src="<%= favicon %>" class="favicon" />
         <span class="name"><%= name %></span>
+        <span class="circle" />
     </script>
 
     <script type="text/template" id="totals-counter-template">
@@ -26,7 +28,20 @@
     <script>
         var Profile = Backbone.Model.extend({
             initialize: function() {
-                this.set("domain", this.get("websiteUrl").split("//")[1]);
+                this.initColor();
+            },
+
+            initColor: function() {
+                var img = new Image();
+
+                var me = this;
+                img.onload = function() {
+                    var colibri = Colibri.extractImageColors(img, 'css');
+                    var color = colibri.content[0];
+
+                    me.set("color", color, {silent: true});
+                };
+                img.src = this.get("favicon");
             },
 
             activeUsers: function() {
@@ -75,6 +90,10 @@
                 var attributes = this.model.attributes;
                 var template = _.template(templateHtml);
                 this.$el.html(template(attributes));
+
+                if (this.model.get("color")) {
+                    this.$el.find(".circle").css("background", this.model.get("color"));
+                }
 
                 return this;
             }
@@ -131,64 +150,60 @@
     </script>
 
     <script>
-      var socket = io();
+        jQuery(function() {
+            var socket = io();
 
-      var profiles = new ProfileCollection();
+            var profiles = new ProfileCollection();
 
-      var counterCollectionView = new CounterCollectionView({
-          collection: profiles,
-          id: 'counters'
-      });
+            var counterCollectionView = new CounterCollectionView({
+                collection: profiles,
+                id: 'counters'
+            });
 
-      var totalsView = new TotalsView({
-          collection: profiles,
-          id: 'totals-counter'
-      });
+            var totalsView = new TotalsView({
+                collection: profiles,
+                id: 'totals-counter'
+            });
 
-      profiles.on("add change", function(profile) {
-          counterCollectionView.render();
-          totalsView.render();
+            var updateGauge = function() {
+                window.setTimeout(updateGauge, 250);
 
-//          new Chartist.Pie(
-//              '.totals-gauge',
-//              {
-//                  series: [
-//                      profiles.totalActiveUsers(),
-//                      profiles.totalActiveUsersDifferenceToMaximum()
-//                  ]
-//              },
-//              {
-//                  donut: true,
-//                  donutWidth: 10,
-//                  startAngle: 270,
-//                  total: profiles.maximumTotalActiveUsers * 2,
-//                  width: "300px",
-//                  height: "300px",
-//                  showLabel: false
-//              }
-//          );
+                if (profiles.maximumTotalActiveUsers == 0) {
+                    return;
+                }
 
-          new Chartist.Pie('#totals-gauge', {
-              series: [
-                  profiles.totalActiveUsers(),
-                  profiles.totalActiveUsersDifferenceToMaximum()
-              ]
-          }, {
-              donut: true,
-              donutWidth: 40,
-              startAngle: 270,
-              total: profiles.maximumTotalActiveUsers * 2,
-              showLabel: false,
-              width: "400px",
-              height: "300px",
-          });
-      });
+                new Chartist.Pie('#totals-gauge', {
+                    series: [
+                        profiles.totalActiveUsers(),
+                        profiles.totalActiveUsersDifferenceToMaximum()
+                    ]
+                }, {
+                    donut: true,
+                    donutWidth: 40,
+                    startAngle: 270,
+                    total: profiles.maximumTotalActiveUsers * 2,
+                    showLabel: false,
+                    width: "400px",
+                    height: "300px"
+                });
+            };
 
-      socket.on('data-update', function(data) {
-          var profile = new Profile(data.profile);
-          console.log(profile.get("name") + ": " + profile.get("activeUsers"));
-          profiles.add(profile, { merge: true });
-      });
+            window.setTimeout(updateGauge, 250);
+
+            profiles.on("add change", function(profile) {
+                counterCollectionView.render();
+                totalsView.render();
+            });
+
+            socket.on('data-update', function(data) {
+                var profile = new Profile(data.profile);
+                console.log(profile.get("name") + ": " + profile.get("activeUsers"));
+                profiles.add(profile, { merge: true });
+            });
+
+            jQuery("#totals-counter-container").prepend(totalsView.render().el);
+            jQuery("#container").append(counterCollectionView.render().el);
+        });
     </script>
 
 </head>
@@ -202,10 +217,5 @@
 
         </div>
     </div>
-
-    <script>
-        jQuery("#totals-counter-container").prepend(totalsView.render().el);
-        jQuery("#container").append(counterCollectionView.render().el);
-    </script>
 </body>
 </html>

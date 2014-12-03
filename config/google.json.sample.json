@@ -1,5 +1,13 @@
 {
     "email": "1234567890@developer.gserviceaccount.com",
     "keyPath": "key.pem",
-    "accountIds": [ "1234567890" ]
+    "account": {
+        "include": [ "1234567890" ]
+    },
+    "webProperty": {
+        "exclude": [ "UA-123456789-1" ]
+    },
+    "profile": {
+        "exclude": [ "9876543210" ]
+    }
 }

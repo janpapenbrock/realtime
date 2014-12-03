@@ -13,7 +13,7 @@ function start(ioStream) {
 var profiles = [];
 
 var requestProfiles = function(err, analytics) {
-    var accountIds = googleConfig.accountIds || [];
+    var accountIds = googleConfig.account.include || [];
 
     accountIds.forEach(function(accountId) {
         var params = {
@@ -27,18 +27,34 @@ var requestProfiles = function(err, analytics) {
                 return err;
             }
 
-            data.items.forEach(function(profile) {
-
-                var reducedProfile = {
-                    id:         profile.id,
-                    websiteUrl: profile.websiteUrl,
-                    name:       profile.name
-                };
-
-                profiles.push(reducedProfile);
-            });
+            data.items.filter(isProfileNotExcluded).forEach(addProfile);
         });
     });
+};
+
+var isProfileNotExcluded = function(profile) {
+    var excludedWebProperties = googleConfig.webProperty.exclude || [];
+    var excludedProfiles      = googleConfig.profile.exclude || [];
+
+    if (excludedWebProperties.indexOf(profile.webPropertyId) > -1) {
+        return false;
+    }
+
+    if (excludedProfiles.indexOf(profile.id) > -1) {
+        return false;
+    }
+
+    return true;
+};
+
+var addProfile = function(profile) {
+    var reducedProfile = {
+        id:         profile.id,
+        websiteUrl: profile.websiteUrl,
+        name:       profile.name
+    };
+
+    profiles.push(reducedProfile);
 };
 
 var requestRealTimeData = function(err, analytics) {

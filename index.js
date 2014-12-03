@@ -6,7 +6,11 @@ var httpServer = server.start(router.route);
 
 var io = socket.start(httpServer);
 
-var realtime = require('./server/realtime.js');
+if (false) {
+    var realtime = require('./server/realtime.js');
+} else {
+    var realtime = require('./server/realtime-simulator.js');
+}
 realtime.start(io);
 
 

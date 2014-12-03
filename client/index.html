@@ -2,13 +2,16 @@
 <head>
     <title>Realtime</title>
 
+    <link rel="stylesheet" href="/assets/css/lib/chartist.min.css" type="text/css" />
     <link rel="stylesheet" href="/assets/css/styles.css" type="text/css" />
 
     <script src="/socket.io/socket.io.js"></script>
 
-    <script src="/jquery-2.1.1.min.js"></script>
-    <script src="/underscore-1.7.0.min.js"></script>
-    <script src="/backbone-1.1.2.min.js"></script>
+    <script src="/assets/js/lib/jquery-2.1.1.min.js"></script>
+    <script src="/assets/js/lib/underscore-1.7.0.min.js"></script>
+    <script src="/assets/js/lib/backbone-1.1.2.min.js"></script>
+
+    <script src="/assets/js/lib/chartist.js"></script>
 
     <script type="text/template" id="counter-row-template">
         <span class="counter"><%= activeUsers %></span>
@@ -17,9 +20,7 @@
     </script>
 
     <script type="text/template" id="totals-counter-template">
-        <span class="intro">Right now</span>
-        <span class="counter"><%= activeUsers %></span>
-        <span class="outro">active users</span>
+        <%= activeUsers %>
     </script>
 
     <script>
@@ -36,8 +37,26 @@
         var ProfileCollection = Backbone.Collection.extend({
             model: Profile,
 
+            maximumTotalActiveUsers: 0,
+
             comparator: function(profile){
                 return 0 - profile.activeUsers();
+            },
+
+            totalActiveUsers: function() {
+                var result = this.models.reduce(function(memo, profile) {
+                    return memo + profile.activeUsers();
+                }, 0);
+
+                this.maximumTotalActiveUsers = Math.max(this.maximumTotalActiveUsers, result);
+
+                return result;
+            },
+
+            totalActiveUsersDifferenceToMaximum: function() {
+                var total = this.totalActiveUsers();
+                var result = this.maximumTotalActiveUsers - total;
+                return result;
             }
         });
 
@@ -90,9 +109,9 @@
         });
 
         var TotalsView = Backbone.View.extend({
-            tagName: "div",
+            tagName: "span",
 
-            className: "column",
+            className: "totals-counter",
 
             initialize: function() {
                 this.listenTo(this.collection, "change", this.render);
@@ -101,11 +120,7 @@
 
             render: function() {
                 var templateHtml = jQuery("#totals-counter-template").html();
-                var attributes = {
-                    activeUsers: this.collection.reduce(function(memo, profile) {
-                        return memo + profile.activeUsers();
-                    }, 0)
-                };
+                var attributes = { activeUsers: this.collection.totalActiveUsers() };
                 var template = _.template(templateHtml);
                 this.$el.html(template(attributes));
 
@@ -127,12 +142,31 @@
 
       var totalsView = new TotalsView({
           collection: profiles,
-          id: 'totals'
+          id: 'totals-counter'
       });
 
       profiles.on("add change", function(profile) {
           counterCollectionView.render();
           totalsView.render();
+
+          new Chartist.Pie(
+                  '#totals-gauge',
+                  {
+                      series: [
+                          profiles.totalActiveUsers(),
+                          profiles.totalActiveUsersDifferenceToMaximum()
+                      ]
+                  },
+                  {
+                      donut: true,
+                      donutWidth: 10,
+                      startAngle: 270,
+                      total: profiles.maximumTotalActiveUsers * 2,
+                      width: "300px",
+                      height: "300px",
+                      showLabel: false
+                  }
+          );
       });
 
       socket.on('data-update', function(data) {
@@ -145,11 +179,16 @@
 </head>
 <body class="dark">
     <div id="container">
-
+        <div id="totals" class="column">
+            <span class="intro">Right now</span>
+            <div id="totals-gauge"></div>
+            <div id="totals-counter-container"></div>
+            <span class="outro">active users</span>
+        </div>
     </div>
 
     <script>
-        jQuery("#container").append(totalsView.render().el);
+        jQuery("#totals-counter-container").append(totalsView.render().el);
         jQuery("#container").append(counterCollectionView.render().el);
     </script>
 </body>

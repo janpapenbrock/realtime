@@ -17,7 +17,7 @@
     margin: 0;
     padding: 0;
     vertical-align: top;
-    width: 50%;
+    width: 49%;
 }
 
 #totals {
@@ -28,13 +28,19 @@
     display: block;
 }
 
-#totals .counter {
+#totals-counter {
     font-size: 10em;
     font-weight: bold;
 }
 
 #totals .intro {
     font-size: .8em;
+}
+
+#totals-gauge {
+    height: 150px;
+    width: 300px;
+    margin: 0 auto;
 }
 
 #counters {

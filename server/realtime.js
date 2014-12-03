@@ -1,5 +1,5 @@
 var analytics = require('./analytics.js');
-
+var faviconLoader = require('./favicon.js');
 var googleConfig = require(__dirname + '/../config/google.json');
 
 var io;
@@ -48,11 +48,22 @@ var isProfileNotExcluded = function(profile) {
 };
 
 var addProfile = function(profile) {
+
+    var domain = profile.websiteUrl.split("//")[1].split("/")[0];
+
+    var favicon = '/favicons/' + profile.id + '.png';
+
     var reducedProfile = {
         id:         profile.id,
         websiteUrl: profile.websiteUrl,
-        name:       profile.name
+        name:       profile.name,
+        domain:     domain,
+        favicon:    favicon
     };
+
+    setTimeout(function() {
+        faviconLoader.download(reducedProfile);
+    }, 0);
 
     profiles.push(reducedProfile);
 };

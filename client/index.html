@@ -149,24 +149,39 @@
           counterCollectionView.render();
           totalsView.render();
 
-          new Chartist.Pie(
-                  '#totals-gauge',
-                  {
-                      series: [
-                          profiles.totalActiveUsers(),
-                          profiles.totalActiveUsersDifferenceToMaximum()
-                      ]
-                  },
-                  {
-                      donut: true,
-                      donutWidth: 10,
-                      startAngle: 270,
-                      total: profiles.maximumTotalActiveUsers * 2,
-                      width: "300px",
-                      height: "300px",
-                      showLabel: false
-                  }
-          );
+//          new Chartist.Pie(
+//              '.totals-gauge',
+//              {
+//                  series: [
+//                      profiles.totalActiveUsers(),
+//                      profiles.totalActiveUsersDifferenceToMaximum()
+//                  ]
+//              },
+//              {
+//                  donut: true,
+//                  donutWidth: 10,
+//                  startAngle: 270,
+//                  total: profiles.maximumTotalActiveUsers * 2,
+//                  width: "300px",
+//                  height: "300px",
+//                  showLabel: false
+//              }
+//          );
+
+          new Chartist.Pie('#totals-gauge', {
+              series: [
+                  profiles.totalActiveUsers(),
+                  profiles.totalActiveUsersDifferenceToMaximum()
+              ]
+          }, {
+              donut: true,
+              donutWidth: 40,
+              startAngle: 270,
+              total: profiles.maximumTotalActiveUsers * 2,
+              showLabel: false,
+              width: "400px",
+              height: "300px",
+          });
       });
 
       socket.on('data-update', function(data) {
@@ -180,15 +195,16 @@
 <body class="dark">
     <div id="container">
         <div id="totals" class="column">
-            <span class="intro">Right now</span>
-            <div id="totals-gauge"></div>
-            <div id="totals-counter-container"></div>
-            <span class="outro">active users</span>
+            <div id="totals-gauge" class="ct-chart"></div>
+            <div id="totals-counter-container">
+                <span class="outro">active users</span>
+            </div>
+
         </div>
     </div>
 
     <script>
-        jQuery("#totals-counter-container").append(totalsView.render().el);
+        jQuery("#totals-counter-container").prepend(totalsView.render().el);
         jQuery("#container").append(counterCollectionView.render().el);
     </script>
 </body>

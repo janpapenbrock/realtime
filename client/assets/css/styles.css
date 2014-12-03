@@ -28,19 +28,28 @@
     display: block;
 }
 
-#totals-counter {
-    font-size: 10em;
-    font-weight: bold;
+#totals-counter-container {
+    position: relative;
+    top: -64px;
 }
 
-#totals .intro {
-    font-size: .8em;
+#totals-counter {
+    font-size: 96px;
+    font-weight: bold;
 }
 
 #totals-gauge {
     height: 150px;
-    width: 300px;
+    width: 400px;
     margin: 0 auto;
+}
+
+.ct-chart .ct-series.ct-series-a .ct-slice.ct-donut {
+    stroke: #70A2C6;
+}
+
+.dark .ct-chart .ct-series.ct-series-b .ct-slice.ct-donut {
+    stroke: #555;
 }
 
 #counters {

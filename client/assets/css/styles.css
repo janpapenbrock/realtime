@@ -48,6 +48,10 @@
     stroke: #70A2C6;
 }
 
+.ct-chart .ct-series.ct-series-b .ct-slice.ct-donut {
+    stroke: #ddd;
+}
+
 .dark .ct-chart .ct-series.ct-series-b .ct-slice.ct-donut {
     stroke: #555;
 }
@@ -78,7 +82,11 @@
 }
 
 .favicon {
-    width: 24px;
-    height: 24px;
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    height: 20px;
     margin: 0 1em;
+    padding: 3px;
+    width: 20px;
 }

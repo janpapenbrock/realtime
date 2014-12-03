@@ -1,0 +1,69 @@
+* {
+    font-family: Arial;
+}
+
+.dark {
+    background: #444;
+    color: white;
+}
+
+#container {
+    margin: 5% auto;
+    width: 80%;
+}
+
+.column {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
+    width: 50%;
+}
+
+#totals {
+    text-align: center;
+}
+
+#totals span {
+    display: block;
+}
+
+#totals .counter {
+    font-size: 10em;
+    font-weight: bold;
+}
+
+#totals .intro {
+    font-size: .8em;
+}
+
+#counters {
+    list-style-type: none;
+}
+
+.counter-row {
+    border-bottom: 1px solid #ddd;
+    padding: 13px 0;
+}
+
+.dark .counter-row {
+    border-color: #666;
+}
+
+.counter-row > * {
+    vertical-align: middle;
+}
+
+#counters .counter {
+    font-size: 1.2em;
+    font-weight: bold;
+    display: inline-block;
+    width: 4em;
+    text-align: right;
+}
+
+.favicon {
+    width: 24px;
+    height: 24px;
+    margin: 0 1em;
+}

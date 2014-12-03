@@ -2,6 +2,8 @@
 <head>
     <title>Realtime</title>
 
+    <link rel="stylesheet" href="/assets/css/styles.css" type="text/css" />
+
     <script src="/socket.io/socket.io.js"></script>
 
     <script src="/jquery-2.1.1.min.js"></script>
@@ -15,7 +17,9 @@
     </script>
 
     <script type="text/template" id="totals-counter-template">
+        <span class="intro">Right now</span>
         <span class="counter"><%= activeUsers %></span>
+        <span class="outro">active users</span>
     </script>
 
     <script>
@@ -60,6 +64,8 @@
         var CounterCollectionView = Backbone.View.extend({
             tagName: 'ul',
 
+            className: 'column',
+
             initialize: function(){
                 this.render();
             },
@@ -69,7 +75,7 @@
 
                 this.$el.html("");
 
-                this.collection.each(function(profile) {
+                this.collection.sort().each(function(profile) {
 
                     if (profile.activeUsers() < 1) {
                         return;
@@ -86,7 +92,7 @@
         var TotalsView = Backbone.View.extend({
             tagName: "div",
 
-            className: "totals",
+            className: "column",
 
             initialize: function() {
                 this.listenTo(this.collection, "change", this.render);
@@ -137,7 +143,7 @@
     </script>
 
 </head>
-<body>
+<body class="dark">
     <div id="container">
 
     </div>

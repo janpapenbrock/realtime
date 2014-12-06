@@ -1,13 +1,22 @@
 var loop = require(__dirname + '/../lib/queue-loop.js');
+var faviconLoader = require('./favicon.js');
 
 function createProfile() {
     var id = Math.ceil(Math.random() * 1000);
 
-    return {
+    var profile = {
         id:         id,
         websiteUrl: id + ".example.com",
-        name:       "example.com " + id
+        name:       "example.com " + id,
+        domain:     "example.com",
+        favicon:    "/favicons/123.png"
     };
+
+    setTimeout(function() {
+        faviconLoader.download(profile);
+    }, 0);
+
+    return profile;
 };
 
 function updateActiveUsers(profile) {

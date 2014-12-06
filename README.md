@@ -4,13 +4,20 @@ realtime
 Setup
 -----
 
-Clone this repo
+#### Clone this repo
 
 ```
 git clone https://github.com/janpapenbrock/realtime.git
 ```
 
-Create a Google API client key file
+#### Install dependencies
+
+```
+/path/to/realtime $ npm install
+```
+
+
+#### Create Google API client key file
 
 1. Create a project in [Google Developers Console](https://console.developers.google.com/project?authuser=0)
 2. At `APIs`, enable `Analytics API`
@@ -23,14 +30,14 @@ openssl pkcs12 -in YOURPROJECTNAME-<hash>.p12 -out key.pem -nocerts -nodes
 ```
 6. Put `key.pem` into `realtime/config/`
 
-Allow your API project to access Analytics properties
+#### Allow API project to access Analytics properties
 
 1. Open Google Analytics
 2. Navigate to `Admin` and choose your account on the left
 3. Open `User Management`
 4. At `Add permissions for:`, enter the mail address associated to your API client ID (`<long-string>@developer.gserviceaccount.com`). `Read and Analyze` setting is sufficent.
 
-Configure Google Analytics views to be shown in realtime dashboard
+#### Configure Google Analytics views to be shown in realtime dashboard
 
 1. Copy `realtime/config/google.json.sample` to `realtime/config/google.json`
 2. Open `realtime/config/google.json` in your favorite editor
@@ -39,7 +46,7 @@ Configure Google Analytics views to be shown in realtime dashboard
 "email": "<long-string>@developer.gserviceaccount.com",
 ```
 3. Analytics accounts are structured on three levels: Accounts, Properties and Views.
-3. Realtime allows to add all **accounts** which should be considered for the dashboard
+3. Realtime allows to add all **Accounts** which should be considered for the dashboard
 ```
     "account": {
         "include": [ "1234567", "2345678" ]
@@ -61,7 +68,6 @@ Start up
 When you are all set up, in a terminal, run
 
 ```
-/path/to/realtime $ npm install
 /path/to/realtime $ node index.js
 ```
 

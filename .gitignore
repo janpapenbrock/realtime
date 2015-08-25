@@ -1,0 +1,4 @@
+node_modules
+config/google.json
+config/*.p12
+config/*.pem

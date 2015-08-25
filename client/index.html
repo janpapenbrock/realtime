@@ -1,0 +1,221 @@
+<html>
+<head>
+    <title>Realtime</title>
+
+    <link rel="stylesheet" href="/assets/css/lib/chartist.min.css" type="text/css" />
+    <link rel="stylesheet" href="/assets/css/styles.css" type="text/css" />
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script src="/assets/js/lib/jquery-2.1.1.min.js"></script>
+    <script src="/assets/js/lib/underscore-1.7.0.min.js"></script>
+    <script src="/assets/js/lib/backbone-1.1.2.min.js"></script>
+
+    <script src="/assets/js/lib/chartist.js"></script>
+    <script src="/assets/js/lib/colibri.min.js"></script>
+
+    <script type="text/template" id="counter-row-template">
+        <span class="counter"><%= activeUsers %></span>
+        <img src="<%= favicon %>" class="favicon" />
+        <span class="name"><%= name %></span>
+        <span class="circle" />
+    </script>
+
+    <script type="text/template" id="totals-counter-template">
+        <%= activeUsers %>
+    </script>
+
+    <script>
+        var Profile = Backbone.Model.extend({
+            initialize: function() {
+                this.initColor();
+            },
+
+            initColor: function() {
+                var img = new Image();
+
+                var me = this;
+                img.onload = function() {
+                    var colibri = Colibri.extractImageColors(img, 'css');
+                    var color = colibri.content[0];
+
+                    me.set("color", color, {silent: true});
+                };
+                img.src = this.get("favicon");
+            },
+
+            activeUsers: function() {
+                return parseInt(this.get("activeUsers"))
+            }
+        });
+
+        var ProfileCollection = Backbone.Collection.extend({
+            model: Profile,
+
+            maximumTotalActiveUsers: 0,
+
+            comparator: function(profile){
+                return 0 - profile.activeUsers();
+            },
+
+            totalActiveUsers: function() {
+                var result = this.models.reduce(function(memo, profile) {
+                    return memo + profile.activeUsers();
+                }, 0);
+
+                this.maximumTotalActiveUsers = Math.max(this.maximumTotalActiveUsers, result);
+
+                return result;
+            },
+
+            totalActiveUsersDifferenceToMaximum: function() {
+                var total = this.totalActiveUsers();
+                var result = this.maximumTotalActiveUsers - total;
+                return result;
+            }
+        });
+
+        var CounterView = Backbone.View.extend({
+            tagName: "li",
+
+            className: "counter-row",
+
+            initialize: function() {
+                this.listenTo(this.model, "change", this.render);
+                this.render();
+            },
+
+            render: function() {
+                var templateHtml = jQuery("#counter-row-template").html();
+                var attributes = this.model.attributes;
+                var template = _.template(templateHtml);
+                this.$el.html(template(attributes));
+
+                if (this.model.get("color")) {
+                    this.$el.find(".circle").css("background", this.model.get("color"));
+                }
+
+                return this;
+            }
+        });
+
+        var CounterCollectionView = Backbone.View.extend({
+            tagName: 'ul',
+
+            className: 'column',
+
+            initialize: function(){
+                this.render();
+            },
+
+            render: function(){
+                var $this = this;
+
+                this.$el.html("");
+
+                this.collection.sort().each(function(profile) {
+
+                    if (profile.activeUsers() < 1) {
+                        return;
+                    }
+
+                    var counterView = new CounterView({ model: profile });
+                    $this.$el.append(counterView.el);
+                });
+
+                return this;
+            }
+        });
+
+        var TotalsView = Backbone.View.extend({
+            tagName: "span",
+
+            className: "totals-counter",
+
+            initialize: function() {
+                this.listenTo(this.collection, "change", this.render);
+                this.render();
+            },
+
+            render: function() {
+                var templateHtml = jQuery("#totals-counter-template").html();
+                var attributes = { activeUsers: this.collection.totalActiveUsers() };
+                var template = _.template(templateHtml);
+                this.$el.html(template(attributes));
+
+                return this;
+            }
+        });
+
+    </script>
+
+    <script>
+        jQuery(function() {
+            var socket = io();
+
+            var profiles = new ProfileCollection();
+
+            var counterCollectionView = new CounterCollectionView({
+                collection: profiles,
+                id: 'counters'
+            });
+
+            var totalsView = new TotalsView({
+                collection: profiles,
+                id: 'totals-counter'
+            });
+
+            var updateGauge = function() {
+                window.setTimeout(updateGauge, 250);
+
+                if (profiles.maximumTotalActiveUsers == 0) {
+                    return;
+                }
+
+                new Chartist.Pie('#totals-gauge', {
+                    series: [
+                        profiles.totalActiveUsers(),
+                        profiles.totalActiveUsersDifferenceToMaximum()
+                    ]
+                }, {
+                    donut: true,
+                    donutWidth: 40,
+                    startAngle: 270,
+                    total: profiles.maximumTotalActiveUsers * 2,
+                    showLabel: false,
+                    width: "400px",
+                    height: "300px"
+                });
+            };
+
+            window.setTimeout(updateGauge, 250);
+
+            profiles.on("add change", function(profile) {
+                counterCollectionView.render();
+                totalsView.render();
+            });
+
+            socket.on('data-update', function(data) {
+                var profile = new Profile(data.profile);
+                console.log(profile.get("name") + ": " + profile.get("activeUsers"));
+                profiles.add(profile, { merge: true });
+            });
+
+            jQuery("#totals-counter-container").prepend(totalsView.render().el);
+            jQuery("#container").append(counterCollectionView.render().el);
+        });
+    </script>
+
+</head>
+<body class="dark">
+    <div id="container">
+        <div id="totals" class="column">
+            <div id="totals-gauge" class="ct-chart"></div>
+            <div id="totals-counter-container">
+                <span class="outro">active users</span>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

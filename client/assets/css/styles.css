@@ -1,0 +1,103 @@
+* {
+    font-family: Arial;
+}
+
+.dark {
+    background: #444;
+    color: white;
+}
+
+#container {
+    margin: 5% auto;
+    width: 80%;
+}
+
+.column {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
+    width: 49%;
+}
+
+#totals {
+    text-align: center;
+}
+
+#totals span {
+    display: block;
+}
+
+#totals-counter-container {
+    position: relative;
+    top: -64px;
+}
+
+#totals-counter {
+    font-size: 96px;
+    font-weight: bold;
+}
+
+#totals-gauge {
+    height: 150px;
+    width: 400px;
+    margin: 0 auto;
+}
+
+.ct-chart .ct-series.ct-series-a .ct-slice.ct-donut {
+    stroke: #70A2C6;
+}
+
+.ct-chart .ct-series.ct-series-b .ct-slice.ct-donut {
+    stroke: #ddd;
+}
+
+.dark .ct-chart .ct-series.ct-series-b .ct-slice.ct-donut {
+    stroke: #555;
+}
+
+#counters {
+    list-style-type: none;
+}
+
+.counter-row {
+    border-bottom: 3px solid #ddd;
+    padding: 13px 0;
+    position: relative;
+}
+
+.dark .counter-row {
+    border-color: #666;
+}
+
+.counter-row > * {
+    vertical-align: middle;
+}
+
+#counters .counter {
+    font-size: 1.2em;
+    font-weight: bold;
+    display: inline-block;
+    width: 4em;
+    text-align: right;
+}
+
+.favicon {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    height: 20px;
+    margin: 0 1em;
+    padding: 3px;
+    width: 20px;
+}
+
+.circle {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    position: absolute;
+    right: 0;
+    margin-top: 4px;
+}

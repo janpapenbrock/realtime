@@ -4,12 +4,18 @@
 
 .dark {
     background: #444;
+    color: black;
+}
+
+.light {
+    background: #999;
     color: white;
 }
 
 #container {
-    margin: 5%;
-    width: 95%;
+    //margin: 5%;
+    //width: 95%;
+    background: url('../../bgd.png') center center/cover;
 }
 
 .column {
@@ -37,7 +43,7 @@
 }
 
 #totals {
-    text-align: center;
+    //text-align: center;
 }
 
 #totals span {
@@ -50,8 +56,9 @@
 }
 
 #totals-counter {
-    font-size: 800px;
+    font-size: 700px;
     font-weight: bold;
+    padding: 50px;
 }
 
 #totals-gauge {
@@ -120,4 +127,5 @@
 
 .outro {
     font-size: 60px;
+    padding: 100px;
 }

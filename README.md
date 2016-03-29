@@ -71,7 +71,7 @@ When you are all set up, in a terminal, run
 /path/to/realtime $ node index.js
 ```
 
-Then open up Chrome and visit http://localhost:8888
+Then open up Chrome and visit http://localhost:8877
 
 Profit
 ------

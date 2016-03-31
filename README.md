@@ -26,7 +26,7 @@ git clone https://github.com/janpapenbrock/realtime.git
 5. Download the created file named `YOURPROJECTNAME-<hash>.p12`
 6. Convert this file into `key-pem` with
 ```
-openssl pkcs12 -in YOURPROJECTNAME-<hash>.p12 -out key.pem -nocerts -nodes
+openssl pkcs12 -in YOURPROJECTNAME-<hash>.p12 -out key.pem -nocerts -nodes -passin pass:notasecret
 ```
 6. Put `key.pem` into `realtime/config/`
 
@@ -71,7 +71,7 @@ When you are all set up, in a terminal, run
 /path/to/realtime $ node index.js
 ```
 
-Then open up Chrome and visit http://localhost:8888
+Then open up Chrome and visit http://localhost:8877
 
 Profit
 ------

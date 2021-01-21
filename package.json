@@ -9,6 +9,6 @@
   "dependencies": {
     "googleapis": "^1.0.21",
     "mime": "^1.2.11",
-    "socket.io": "^1.2.1"
+    "socket.io": "^2.4.0"
   }
 }
